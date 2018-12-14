@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <style>
+        body {
+            background-color: lightgray;
+        }
+        .header {
+            background-color: white;
+            color: gray;
+            width: 700px;
+        }
+        .header * {
+            padding: 0px 20px;
+            display: inline-block;
+        }
+
+        .header p {
+            margin-right: 20px;
+            margin-left: 200px;
+            color: #555555;
+        }
+        
+        .comment {
+            text-indent: 3em;
+            color: #888888;
+        }
+
+        .commenter {
+            font-size: .9em;
+        }
+
+        .wall {
+            padding-left: 30px;
+        }
+
+        textarea {
+            background-color: #555555;
+            color: white;
+            width: 350px;
+            height: 50px;
+        }
+
+        .subbutton {
+            background-color: rgb(43, 108, 230);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .commbutton {
+            background-color: rgb(40, 161, 40);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .delbutton {
+            background-color: rgba(216, 0, 0, 0.815);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            padding: 3px;
+            font-size: .7em;
+        }
+
+        form {
+            display: inline-block;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Coding Dojo</h1>
+            <p>Welcome {{ request.session.use }}</p>
+            <a href="/logout">Log Out</a>
+        </div>
+        <div class="wall">
+        <h2>Post a message</h2>
+        <form action="/post_message" method="POST">
+            {% csrf_token %}
+            <textarea name="message"></textarea><br>
+            <button type=submit class="subbutton">Post a Message</button>
+        </form>
+        {% for post in posts %}
+            <p>{{ post.creator.first_name }} {{post.creator.last_name}} - {{ post.created_at}}</p>
+            <h3>{{ post.message }}</h3>
+            <form action="/post_comment" method="POST">
+                {% csrf_token %}
+                {% for comment in comments %}
+                    {% if comment.commment_message.id == post.id %}
+                    <div class="comment">
+                        <p class="commenter">{{comment.commenter.first_name}} {{comment.commenter.lastname}}-{{comment.commenter.created_at}}</p>
+                        <h4>{{ comment.comment }}</h4>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                <textarea name="comment"></textarea><br>
+                <input type ="hidden" name="pid" value="{{ post.id }}">
+                <button type=submit class="commbutton">Post a Comment</button>
+            </form>
+            <a href="/delete_post/{{post.id}}" class="delbutton">Delete Post</a>
+        {% endfor %}
+        </div>
+    </body>
+</html>
